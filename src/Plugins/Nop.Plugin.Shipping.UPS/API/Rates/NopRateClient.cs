@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Net.Http;
-using System.Reflection;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Nop.Plugin.Shipping.UPS.Services;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Nop.Plugin.Shipping.UPS.API.Rates
 {
@@ -33,7 +28,8 @@ namespace Nop.Plugin.Shipping.UPS.API.Rates
 
         public async Task<RateResponse> ProcessRateAsync(RateRequest request)
         {
-            var response = await RatingAsync("v1", "Rate", new RATERequestWrapper
+            var response = await RateAsync(Guid.NewGuid().ToString(),
+                _upsSettings.UseSandbox ? "testing" : UPSDefaults.SystemName, string.Empty, "v1", "Shop", new RATERequestWrapper
             {
                 RateRequest = request
             });
@@ -45,5 +41,21 @@ namespace Nop.Plugin.Shipping.UPS.API.Rates
         {
             settings.ContractResolver = new NullToEmptyStringResolver();
         }
+    }
+
+    public partial class RateResponse_RatedShipment
+    {
+        /// <summary>
+        /// <remarks>
+        /// For some reason, the description of this field in the API definition
+        /// does not correspond to reality, so we had to remove this field from the
+        /// automatically generated code and create the correct signature manually.
+        ///
+        /// Do not delete this field unless you have made sure that the description of the API
+        /// or the response from the server has changed</remarks>
+        /// </summary>
+        [JsonProperty("RatedPackage", Required = Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required]
+        public RatedShipment_RatedPackage RatedPackage { get; set; }
     }
 }

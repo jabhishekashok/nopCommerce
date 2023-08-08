@@ -88,8 +88,8 @@ namespace Nop.Plugin.Shipping.UPS.Controllers
             };
 
             //prepare offered delivery services
-            var servicesCodes = _upsSettings.CarrierServicesOffered.Split(':', StringSplitOptions.RemoveEmptyEntries)
-                .Select(idValue => idValue.Trim('[', ']')).ToList();
+            var servicesCodes = _upsSettings.CarrierServicesOffered?.Split(':', StringSplitOptions.RemoveEmptyEntries)
+                .Select(idValue => idValue.Trim('[', ']')).ToList() ?? new List<string>();
 
             //prepare available options
             model.AvailableCustomerClassifications = (await CustomerClassification.DailyRates.ToSelectListAsync(false))

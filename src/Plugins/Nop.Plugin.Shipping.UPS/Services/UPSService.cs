@@ -333,7 +333,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
 
             var addressFrom = new Shipper_Address
             {
-                AddressLine = shippingOptionRequest.AddressFrom,
+                AddressLine = new[] { shippingOptionRequest.AddressFrom },
                 City = shippingOptionRequest.CityFrom,
                 StateProvinceCode = stateCodeFrom,
                 CountryCode = countryCodeFrom,
@@ -342,7 +342,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
 
             var addressFromDetails = new ShipFrom_Address
             {
-                AddressLine = shippingOptionRequest.AddressFrom,
+                AddressLine = new[] { shippingOptionRequest.AddressFrom },
                 City = shippingOptionRequest.CityFrom,
                 StateProvinceCode = stateCodeFrom ,
                 CountryCode = countryCodeFrom,
@@ -351,7 +351,7 @@ namespace Nop.Plugin.Shipping.UPS.Services
 
             var addressToDetails = new ShipTo_Address
             {
-                AddressLine = shippingOptionRequest.ShippingAddress.Address1,
+                AddressLine = new[] { shippingOptionRequest.ShippingAddress.Address1, shippingOptionRequest.ShippingAddress.Address2 },
                 City = shippingOptionRequest.ShippingAddress.City,
                 StateProvinceCode = stateCodeTo,
                 CountryCode = (await _countryService.GetCountryByAddressAsync(shippingOptionRequest.ShippingAddress))?.TwoLetterIsoCode,
@@ -447,12 +447,12 @@ namespace Nop.Plugin.Shipping.UPS.Services
                 Width = width.ToString("0.00", CultureInfo.InvariantCulture),
                 Length = length.ToString("0.00", CultureInfo.InvariantCulture),
                 Height = height.ToString("0.00", CultureInfo.InvariantCulture),
-                UnitOfMeasurement = new Dimensions_UnitOfMeasurement { Code = _upsSettings.DimensionsType }
+                UnitOfMeasurement = new Dimensions_UnitOfMeasurement { Code = _upsSettings.DimensionsType, Description = _upsSettings.DimensionsType }
             };
             package.PackageWeight = new Package_PackageWeight
             {
                 Weight = weight.ToString("0.00", CultureInfo.InvariantCulture),
-                UnitOfMeasurement = new PackageWeight_UnitOfMeasurement { Code = _upsSettings.WeightType },
+                UnitOfMeasurement = new PackageWeight_UnitOfMeasurement { Code = _upsSettings.WeightType, Description = _upsSettings.WeightType },
             };
 
             //set insurance details
@@ -847,8 +847,11 @@ namespace Nop.Plugin.Shipping.UPS.Services
 
                 //parse transit days
                 int? transitDays = null;
-                if (!string.IsNullOrWhiteSpace(rate.TimeInTransit.ServiceSummary.EstimatedArrival.BusinessDaysInTransit))
-                    if (int.TryParse(rate.TimeInTransit.ServiceSummary.EstimatedArrival.BusinessDaysInTransit, out var businessDaysInTransit))
+
+                var serviceSummary = rate.TimeInTransit?.ServiceSummary.FirstOrDefault();
+
+                if (serviceSummary != null)
+                    if (!string.IsNullOrWhiteSpace(serviceSummary.EstimatedArrival.BusinessDaysInTransit) && int.TryParse(serviceSummary.EstimatedArrival.BusinessDaysInTransit, out var businessDaysInTransit))
                         transitDays = businessDaysInTransit;
 
                 //add shipping option based on service rate
