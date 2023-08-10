@@ -17,8 +17,10 @@ pipeline {
             }
         }
         stage('Build'){
-            sh 'ls -al'
-            //sh 'docker image build -t theabhij/nopimg:2.0'
+            steps{
+                sh 'ls -al'
+                //sh 'docker image build -t theabhij/nopimg:2.0'
+            }
 
         }
         
