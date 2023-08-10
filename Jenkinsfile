@@ -10,10 +10,18 @@ pipeline {
         pollSCM('* * * * *') 
     }
     stages {
-        stage('Example') {
+        stage('VCS') {
             steps {
-                echo 'Hello World'
+                git url: "https://github.com/jabhishekashok/nopCommerce.git"
+                    branch: "develop"
             }
         }
+        stage('Build'){
+            sh 'ls -al'
+            //sh 'docker image build -t theabhij/nopimg:2.0'
+
+        }
+        
     }
+
 }
